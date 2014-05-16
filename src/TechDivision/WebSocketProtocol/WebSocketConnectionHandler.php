@@ -23,6 +23,7 @@ use Ratchet\WebSocket\Version\HyBi10;
 use Ratchet\WebSocket\Version\Hixie76;
 use Guzzle\Http\Message\Response;
 use Guzzle\Http\Message\RequestInterface;
+use TechDivision\WebServer\Interfaces\ServerContextInterface;
 
 /**
  * The adapter to handle WebSocket requests/responses.
@@ -38,7 +39,7 @@ use Guzzle\Http\Message\RequestInterface;
  * @link http://ca.php.net/manual/en/ref.http.php
  * @link http://dev.w3.org/html5/websockets/
  */
-class RatchetRequest implements MessageComponentInterface
+class WebSocketConnectionHandler implements MessageComponentInterface
 {
 
     /**
@@ -91,6 +92,20 @@ class RatchetRequest implements MessageComponentInterface
     private $isSpGenerated = false;
 
     /**
+     * The server context instance.
+     *
+     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     */
+    protected $serverContext;
+
+    /**
+     * Holds an array of modules to use for connection handler.
+     *
+     * @var array
+     */
+    protected $modules;
+
+    /**
      * Initialize the web socket server with the container's applications.
      *
      * @param array $applications
@@ -112,6 +127,66 @@ class RatchetRequest implements MessageComponentInterface
         // initialize connection pool and applications
         $this->connections = new \SplObjectStorage();
         $this->applications = &$applications;
+    }
+
+    /**
+     * Inits the connection handler by given context and params
+     *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The servers context
+     * @param array                                                     $params        The params for connection handler
+     *
+     * @return void
+     */
+    public function init(ServerContextInterface $serverContext, array $params = null)
+    {
+
+        // set server context
+        $this->serverContext = $serverContext;
+
+        // register shutdown handler
+        register_shutdown_function(array(&$this, "shutdown"));
+    }
+
+    /**
+     * Does shutdown logic for worker if something breaks in process.
+     *
+     * @return void
+     */
+    public function shutdown()
+    {
+    	// do nothing here
+    }
+
+    /**
+     * Injects all needed modules for connection handler to process
+     *
+     * @param array $modules An array of Modules
+     *
+     * @return void
+     */
+    public function injectModules($modules)
+    {
+        $this->modules = $modules;
+    }
+
+    /**
+     * Returns all needed modules as array for connection handler to process
+     *
+     * @return array An array of Modules
+     */
+    public function getModules()
+    {
+        return $this->modules;
+    }
+
+    /**
+     * Returns the worker instance which starte this worker thread
+     *
+     * @return \TechDivision\WebServer\Interfaces\WorkerInterface
+     */
+    protected function getWorker()
+    {
+        return $this->worker;
     }
 
     /**
@@ -191,9 +266,14 @@ class RatchetRequest implements MessageComponentInterface
      *            The request to find and return the application instance for
      * @return \Ratchet\MessageComponentInterface The handler instance
      */
-    public function locateHandler(RequestInterface $request)
+    public function locateHandler(RequestInterface $guzzleRequest)
     {
-        return $this->findApplication($request)->locate($request);
+
+    	// initialize a new web socket request
+		$request = new WebSocketRequest();
+		$request->injectRequest($guzzleRequest);
+
+        return $this->findApplication($request)->locateHandler($request);
     }
 
     /**
@@ -204,20 +284,11 @@ class RatchetRequest implements MessageComponentInterface
      * @return \TechDivision\WebSocketContainer\Application The application instance
      * @throws \TechDivision\WebSocketContainer\Exceptions\BadRequestException Is thrown if no application can be found for the passed application name
      */
-    public function findApplication(RequestInterface $request)
+    public function findApplication(Request $request)
     {
 
-        // load the server name
+        // load the path information and the server name
         $host = $request->getHost();
-
-        // iterate over the applications and check if one of the VHosts match the request
-        foreach ($this->applications as $application) {
-            if ($application->isVhostOf($host)) {
-                return $application;
-            }
-        }
-
-        // load path information
         $pathInfo = $request->getPath();
 
         // strip the leading slash and explode the application name
@@ -225,11 +296,36 @@ class RatchetRequest implements MessageComponentInterface
 
         // if not, check if the request matches a folder
         if (array_key_exists($applicationName, $this->applications)) {
-            return $this->applications[$applicationName];
+
+        	$application = $this->applications[$applicationName];
+
+        } else { // iterate over the applications and check if one of the virtual hosts match the request
+
+	        foreach ($this->applications as $application) {
+	            if ($application->isVhostOf($host)) {
+	                break;
+	            }
+	        }
         }
 
-        // if not throw an exception
-        throw new BadRequestException("Can\'t find application for '$applicationName'");
+        // if not throw an exception if we can't find an application
+        if ($application == null) {
+        	throw new BadRequestException("Can't find application for '$applicationName'");
+        }
+
+        // prepare and set the applications context path
+        $request->setContextPath($contextPath = '/' . $application->getName());
+
+        // prepare the path information depending if we're in a vhost or not
+        if ($application->isVhostOf($host) === false) {
+            $request->setHandlerPath(str_replace($contextPath, '', $request->getHandlerPath()));
+        }
+
+        // inject the application context into the handler request
+        $request->injectContext($application);
+
+        // return, because request has been prepared successfully
+        return $application;
     }
 
     /**
