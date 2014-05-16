@@ -8,7 +8,18 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
+ *
+ * PHP version 5
+ *
+ * @category  Library
+ * @package   TechDivision_WebSocketProtocol
+ * @author    Tim Wagner <tw@techdivision.com>
+ * @copyright 2014 TechDivision GmbH <info@techdivision.com>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
+ * @link      http://www.appserver.io
  */
+
 namespace TechDivision\WebSocketProtocol;
 
 use Ratchet\WebSocket\WsServer;
@@ -31,13 +42,15 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  * This is a mediator between the Server and the applications provided by
  * the container to handle real-time messaging through a web browser.
  *
- * @package TechDivision\WebSocketContainer
- * @copyright Copyright (c) 2010 <info@techdivision.com> - TechDivision GmbH
- * @license http://opensource.org/licenses/osl-3.0.php
- *          Open Software License (OSL 3.0)
- * @author Tim Wagner <tw@techdivision.com>
- * @link http://ca.php.net/manual/en/ref.http.php
- * @link http://dev.w3.org/html5/websockets/
+ * @category  Library
+ * @package   TechDivision_WebSocketProtocol
+ * @author    Tim Wagner <tw@techdivision.com>
+ * @copyright 2014 TechDivision GmbH <info@techdivision.com>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
+ * @link      http://www.appserver.iof
+ * @link      http://ca.php.net/manual/en/ref.http.php
+ * @link      http://dev.w3.org/html5/websockets/
  */
 class WebSocketConnectionHandler implements MessageComponentInterface
 {
@@ -290,6 +303,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         // load the path information and the server name
         $host = $request->getHost();
         $pathInfo = $request->getPath();
+
+        // initialize the handler path
+		$request->setHandlerPath($request->getPath());
 
         // strip the leading slash and explode the application name
         list ($applicationName, $path) = explode('/', substr($pathInfo, 1));
