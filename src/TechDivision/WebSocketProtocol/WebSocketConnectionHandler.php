@@ -8,7 +8,18 @@
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
+ *
+ * PHP version 5
+ *
+ * @category  Library
+ * @package   TechDivision_WebSocketProtocol
+ * @author    Tim Wagner <tw@techdivision.com>
+ * @copyright 2014 TechDivision GmbH <info@techdivision.com>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
+ * @link      http://www.appserver.io
  */
+
 namespace TechDivision\WebSocketProtocol;
 
 use Ratchet\WebSocket\WsServer;
@@ -31,13 +42,15 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  * This is a mediator between the Server and the applications provided by
  * the container to handle real-time messaging through a web browser.
  *
- * @package TechDivision\WebSocketContainer
- * @copyright Copyright (c) 2010 <info@techdivision.com> - TechDivision GmbH
- * @license http://opensource.org/licenses/osl-3.0.php
- *          Open Software License (OSL 3.0)
- * @author Tim Wagner <tw@techdivision.com>
- * @link http://ca.php.net/manual/en/ref.http.php
- * @link http://dev.w3.org/html5/websockets/
+ * @category  Library
+ * @package   TechDivision_WebSocketProtocol
+ * @author    Tim Wagner <tw@techdivision.com>
+ * @copyright 2014 TechDivision GmbH <info@techdivision.com>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
+ * @link      http://www.appserver.iof
+ * @link      http://ca.php.net/manual/en/ref.http.php
+ * @link      http://dev.w3.org/html5/websockets/
  */
 class WebSocketConnectionHandler implements MessageComponentInterface
 {
@@ -108,8 +121,8 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Initialize the web socket server with the container's applications.
      *
-     * @param array $applications
-     *            The initialized applications
+     * @param array &$applications The initialized applications
+     *
      * @return void
      */
     public function __construct(&$applications)
@@ -144,7 +157,10 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $this->serverContext = $serverContext;
 
         // register shutdown handler
-        register_shutdown_function(array(&$this, "shutdown"));
+        register_shutdown_function(array(
+            &$this,
+            "shutdown"
+        ));
     }
 
     /**
@@ -154,13 +170,13 @@ class WebSocketConnectionHandler implements MessageComponentInterface
      */
     public function shutdown()
     {
-    	// do nothing here
+        // do nothing here
     }
 
     /**
      * Injects all needed modules for connection handler to process
      *
-     * @param array $modules An array of Modules
+     * @param array $modules An array of modules
      *
      * @return void
      */
@@ -190,8 +206,11 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
-     * (non-PHPdoc)
+     * This method will be invoked after the connection has been established.
      *
+     * @param \Ratchet\ConnectionInterface $conn The connection that has been established
+     *
+     * @return void
      * @see \Ratchet\ComponentInterface::onOpen()
      */
     public function onOpen(ConnectionInterface $conn)
@@ -201,8 +220,13 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
-     * (non-PHPdoc)
+     * This method will be invoked when a new message, that has to be processed,
+     * came in.
      *
+     * @param \Ratchet\ConnectionInterface $from The connection that has been established
+     * @param string                       $msg  The message itself
+     *
+     * @return void
      * @see \Ratchet\MessageInterface::onMessage()
      */
     public function onMessage(ConnectionInterface $from, $msg)
@@ -212,7 +236,6 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         }
 
         if (isset($from->WebSocket->request)) {
-            ;
             $from->WebSocket->request->getBody()->write($msg);
         } else {
 
@@ -224,7 +247,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
                 return $this->close($from, 413);
             }
 
-            if (! $this->versioner->isVersionEnabled($request)) {
+            if (!$this->versioner->isVersionEnabled($request)) {
                 return $this->close($from);
             }
 
@@ -262,25 +285,30 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Locates the web socket handler for the passed request.
      *
-     * @param \Guzzle\Http\Message\RequestInterface $request
-     *            The request to find and return the application instance for
+     * @param \Guzzle\Http\Message\RequestInterface $guzzleRequest The request to find and return the application instance for
+     *
      * @return \Ratchet\MessageComponentInterface The handler instance
      */
     public function locateHandler(RequestInterface $guzzleRequest)
     {
 
-    	// initialize a new web socket request
-		$request = new WebSocketRequest();
-		$request->injectRequest($guzzleRequest);
+        // initialize a new web socket request
+        $request = new WebSocketRequest();
+        $request->injectRequest($guzzleRequest);
 
-        return $this->findApplication($request)->locateHandler($request);
+        // load the application and try to locate the handler
+        $handler = $this->findApplication($request)->locateHandler($request);
+        $handler->injectRequest($request);
+
+        // return the initialized handler instance
+        return $handler;
     }
 
     /**
      * Tries to find and return the application for the passed request.
      *
-     * @param \Guzzle\Http\Message\RequestInterface $request
-     *            The request to find and return the application instance for
+     * @param \Guzzle\Http\Message\RequestInterface $request The request to find and return the application instance for
+     *
      * @return \TechDivision\WebSocketContainer\Application The application instance
      * @throws \TechDivision\WebSocketContainer\Exceptions\BadRequestException Is thrown if no application can be found for the passed application name
      */
@@ -291,26 +319,28 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $host = $request->getHost();
         $pathInfo = $request->getPath();
 
+        // initialize the handler path
+        $request->setHandlerPath($request->getPath());
+
         // strip the leading slash and explode the application name
         list ($applicationName, $path) = explode('/', substr($pathInfo, 1));
 
         // if not, check if the request matches a folder
         if (array_key_exists($applicationName, $this->applications)) {
 
-        	$application = $this->applications[$applicationName];
-
+            $application = $this->applications[$applicationName];
         } else { // iterate over the applications and check if one of the virtual hosts match the request
 
-	        foreach ($this->applications as $application) {
-	            if ($application->isVhostOf($host)) {
-	                break;
-	            }
-	        }
+            foreach ($this->applications as $application) {
+                if ($application->isVhostOf($host)) {
+                    break;
+                }
+            }
         }
 
         // if not throw an exception if we can't find an application
         if ($application == null) {
-        	throw new BadRequestException("Can't find application for '$applicationName'");
+            throw new BadRequestException("Can't find application for '$applicationName'");
         }
 
         // prepare and set the applications context path
@@ -329,8 +359,11 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
-     * (non-PHPdoc)
+     * This method will be invoked before the connection will be closed.
      *
+     * @param \Ratchet\ConnectionInterface $conn The connection that will be closed
+     *
+     * @return void
      * @see \Ratchet\ComponentInterface::onClose()
      */
     public function onClose(ConnectionInterface $conn)
@@ -339,7 +372,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
             $decor = $this->connections[$conn];
             $this->connections->detach($conn);
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     $handler->onClose($decor);
                 }
             }
@@ -347,15 +380,19 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
-     * (non-PHPdoc)
+     * This method will be invoked if an error on a connection has been occured.
      *
+     * @param \Ratchet\ConnectionInterface $conn The connection throwing an error
+     * @param \Exception                   $e    The exception that has been thrown
+     *
+     * @return void
      * @see \Ratchet\ComponentInterface::onError()
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         if ($conn->WebSocket->established) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     $handler->onError($this->connections[$conn], $e);
                 }
             }
@@ -367,9 +404,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Disable a specific version of the WebSocket protocol
      *
-     * @param int $versionId
-     *            Version ID to disable
-     * @return WsServer
+     * @param integer $versionId Version ID to disable
+     *
+     * @return \TechDivision\WebSocketProtocol\WebSocketConnectionHandler The handler itself
      */
     public function disableVersion($versionId)
     {
@@ -380,9 +417,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Toggle weather to check encoding of incoming messages
      *
-     * @param
-     *            bool
-     * @return WsServer
+     * @param boolean $opt TRUE if encoding has to be checked, else FALSE
+     *
+     * @return \TechDivision\WebSocketProtocol\WebSocketConnectionHandler The handler itself
      */
     public function setEncodingChecks($opt)
     {
@@ -391,16 +428,18 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
+     * This method checks if the sub protocol with the passed name
+     * is supported by this connection handler.
      *
-     * @param
-     *            string
-     * @return boolean
+     * @param string $name The sub protocol name to be checked
+     *
+     * @return boolean TRUE if the sub protocol is supported, else FALSE
      */
     public function isSubProtocolSupported($name)
     {
         if ($this->isSpGenerated === false) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     if ($this->_decorating instanceof WsServerInterface) {
                         $this->acceptedSubProtocols = array_merge($this->acceptedSubProtocols, array_flip($handler->getSubProtocols()));
                     }
@@ -412,9 +451,11 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     }
 
     /**
+     * Returns the sub protocol, if supported, as string.
      *
-     * @param \Traversable|null $requested
-     * @return string
+     * @param \Traversable|null $requested The list with sub protocols
+     *
+     * @return string The sub protocol name
      */
     protected function getSubProtocolString(\Traversable $requested = null)
     {
@@ -436,9 +477,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Close a connection with an HTTP response.
      *
-     * @param \Ratchet\ConnectionInterface $conn
-     * @param int $code
-     *            HTTP status code
+     * @param \Ratchet\ConnectionInterface $conn The connection to be closed
+     * @param integer                      $code HTTP status code
+     *
      * @return void
      */
     protected function close(ConnectionInterface $conn, $code = 400)

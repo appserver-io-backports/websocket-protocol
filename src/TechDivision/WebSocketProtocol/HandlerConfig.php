@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TechDivision\WebSocketProtocol\BadRequestException
+ * TechDivision\WebSocketProtocol\HandlerConfig
  *
  * NOTICE OF LICENSE
  *
@@ -23,7 +23,7 @@
 namespace TechDivision\WebSocketProtocol;
 
 /**
- * Is thrown if no application can be found for the passed application name.
+ * Interface for the handler configuration.
  *
  * @category  Library
  * @package   TechDivision_WebSocketProtocol
@@ -33,6 +33,27 @@ namespace TechDivision\WebSocketProtocol;
  * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
  * @link      http://www.appserver.io
  */
-class BadRequestException extends \Exception
+interface HandlerConfig
 {
+
+    /**
+     * Returns the handlers name from the handler.xml configuration file.
+     *
+     * @return string The handler name
+     */
+    public function getHandlerName();
+
+    /**
+     * Returns the handler context instance.
+     *
+     * @return \TechDivision\WebSocketProtocol\HandlerContext The handler context instance
+     */
+    public function getHandlerContext();
+
+    /**
+     * Returns the webapp base path.
+     *
+     * @return string The webapp base path
+     */
+    public function getWebappPath();
 }

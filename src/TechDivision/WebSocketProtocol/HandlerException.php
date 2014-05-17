@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TechDivision\WebSocketProtocol\BadRequestException
+ * TechDivision\WebSocketProtocol\HandlerException
  *
  * NOTICE OF LICENSE
  *
@@ -20,10 +20,10 @@
  * @link      http://www.appserver.io
  */
 
-namespace TechDivision\WebSocketProtocol;
+namespace TechDivision\WebSocketServer\Handlers;
 
 /**
- * Is thrown if no application can be found for the passed application name.
+ * Is thrown if a servlet can't be initialized.
  *
  * @category  Library
  * @package   TechDivision_WebSocketProtocol
@@ -33,6 +33,6 @@ namespace TechDivision\WebSocketProtocol;
  * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
  * @link      http://www.appserver.io
  */
-class BadRequestException extends \Exception
+class HandlerException extends \Exception
 {
 }
