@@ -50,7 +50,7 @@ interface Handler extends MessageComponentInterface
     public function init(HandlerConfig $config);
 
     /**
-     * Return's the servlets configuration.
+     * Returns the servlets configuration.
      *
      * @return \TechDivision\WebSocketProtocol\HandlerConfig The handlers configuration
      */
@@ -62,4 +62,11 @@ interface Handler extends MessageComponentInterface
      * @return \TechDivision\WebSocketProtocol\HandlerContext The handler context instance
      */
     public function getHandlerContext();
+
+    /**
+     * Returns the request instance.
+     *
+     * @return \TechDivision\WebSocketProtocol\Request The request instance
+     */
+    public function getRequest();
 }

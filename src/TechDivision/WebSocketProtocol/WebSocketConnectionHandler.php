@@ -297,7 +297,11 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $request->injectRequest($guzzleRequest);
 
         // load the application and try to locate the handler
-        return $this->findApplication($request)->locateHandler($request);
+        $handler = $this->findApplication($request)->locateHandler($request);
+        $handler->injectRequest($request);
+
+        // return the initialized handler instance
+        return $handler;
     }
 
     /**
