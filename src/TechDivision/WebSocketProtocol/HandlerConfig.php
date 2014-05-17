@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TechDivision\WebSocketProtocol\HandlerContext
+ * TechDivision\WebSocketProtocol\HandlerConfig
  *
  * NOTICE OF LICENSE
  *
@@ -23,7 +23,7 @@
 namespace TechDivision\WebSocketProtocol;
 
 /**
- * The handler context inteface for all handler managers.
+ * Interface for the handler configuration.
  *
  * @category  Library
  * @package   TechDivision_WebSocketProtocol
@@ -33,37 +33,27 @@ namespace TechDivision\WebSocketProtocol;
  * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
  * @link      http://www.appserver.io
  */
-interface HandlerContext
+interface HandlerConfig
 {
 
     /**
-     * Has been automatically invoked by the container after the application
-     * instance has been created.
+     * Returns the handlers name from the handler.xml configuration file.
      *
-     * @return \TechDivision\WebContainer\WebApplication The connected application
+     * @return string The handler name
      */
-    public function initialize();
+    public function getHandlerName();
 
     /**
-     * Returns the registered handlers.
+     * Returns the handler context instance.
      *
-     * @return array An array with the initialized web socket handlers
+     * @return \TechDivision\WebSocketProtocol\HandlerContext The handler context instance
      */
-    public function getHandlers();
+    public function getHandlerContext();
 
     /**
-     * Returns the registered handlers.
+     * Returns the webapp base path.
      *
-     * @param string $key The key the handler to be returned has been registered with.
-     *
-     * @return \Ratchet\MessageComponentInterface The requested handler
-     */
-    public function getHandler($key);
-
-    /**
-     * Returns the path to the webapp.
-     *
-     * @return string The path to the webapp
+     * @return string The webapp base path
      */
     public function getWebappPath();
 }

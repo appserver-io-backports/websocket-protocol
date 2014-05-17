@@ -368,7 +368,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
             $decor = $this->connections[$conn];
             $this->connections->detach($conn);
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     $handler->onClose($decor);
                 }
             }
@@ -388,7 +388,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     {
         if ($conn->WebSocket->established) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     $handler->onError($this->connections[$conn], $e);
                 }
             }
@@ -435,7 +435,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     {
         if ($this->isSpGenerated === false) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandler() as $handler) {
+                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
                     if ($this->_decorating instanceof WsServerInterface) {
                         $this->acceptedSubProtocols = array_merge($this->acceptedSubProtocols, array_flip($handler->getSubProtocols()));
                     }

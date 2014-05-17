@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TechDivision\WebSocketProtocol\HandlerContext
+ * TechDivision\WebSocketProtocol\Handler
  *
  * NOTICE OF LICENSE
  *
@@ -22,8 +22,11 @@
 
 namespace TechDivision\WebSocketProtocol;
 
+use Ratchet\MessageComponentInterface;
+use TechDivision\WebSocketProtocol\HandlerConfig;
+
 /**
- * The handler context inteface for all handler managers.
+ * Interface for all handlers.
  *
  * @category  Library
  * @package   TechDivision_WebSocketProtocol
@@ -33,37 +36,30 @@ namespace TechDivision\WebSocketProtocol;
  * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
  * @link      http://www.appserver.io
  */
-interface HandlerContext
+interface Handler extends MessageComponentInterface
 {
 
     /**
-     * Has been automatically invoked by the container after the application
-     * instance has been created.
+     * Initializes the handler with the passed configuration.
      *
-     * @return \TechDivision\WebContainer\WebApplication The connected application
+     * @param \TechDivision\WebSocketProtocol\HandlerConfig $config The configuration to initialize the handler with
+     *
+     * @return void
+     * @throws \TechDivision\WebSocketProtocol\HandlerException Is thrown if the configuration has errors
      */
-    public function initialize();
+    public function init(HandlerConfig $config);
 
     /**
-     * Returns the registered handlers.
+     * Return's the servlets configuration.
      *
-     * @return array An array with the initialized web socket handlers
+     * @return \TechDivision\WebSocketProtocol\HandlerConfig The handlers configuration
      */
-    public function getHandlers();
+    public function getHandlerConfig();
 
     /**
-     * Returns the registered handlers.
+     * Returns the handler context instance
      *
-     * @param string $key The key the handler to be returned has been registered with.
-     *
-     * @return \Ratchet\MessageComponentInterface The requested handler
+     * @return \TechDivision\WebSocketProtocol\HandlerContext The handler context instance
      */
-    public function getHandler($key);
-
-    /**
-     * Returns the path to the webapp.
-     *
-     * @return string The path to the webapp
-     */
-    public function getWebappPath();
+    public function getHandlerContext();
 }
