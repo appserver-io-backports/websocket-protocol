@@ -309,7 +309,11 @@ class WebSocketConnectionHandler implements MessageComponentInterface
      *
      * @param \Guzzle\Http\Message\RequestInterface $request The request to find and return the application instance for
      *
+<<<<<<< HEAD
      * @return \TechDivision\WebContainer\WebApplication The application instance
+=======
+     * @return \TechDivision\ApplicationServer\Interfaces\ApplicationInterface The application instance
+>>>>>>> 3f3499613ec1769db79f43a790a011e4b52c54e8
      * @throws \TechDivision\WebSocketProtocol\BadRequestException Is thrown if no application can be found for the passed application name
      */
     public function findApplication(Request $request)
