@@ -34,7 +34,7 @@ use Ratchet\WebSocket\Version\HyBi10;
 use Ratchet\WebSocket\Version\Hixie76;
 use Guzzle\Http\Message\Response;
 use Guzzle\Http\Message\RequestInterface;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
  * The adapter to handle WebSocket requests/responses.
@@ -107,7 +107,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * The server context instance.
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
@@ -145,8 +145,8 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Inits the connection handler by given context and params
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The servers context
-     * @param array                                                     $params        The params for connection handler
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The servers context
+     * @param array                                                  $params        The params for connection handler
      *
      * @return void
      */
@@ -198,7 +198,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Returns the worker instance which starte this worker thread
      *
-     * @return \TechDivision\WebServer\Interfaces\WorkerInterface
+     * @return \TechDivision\Server\Interfaces\WorkerInterface
      */
     protected function getWorker()
     {
