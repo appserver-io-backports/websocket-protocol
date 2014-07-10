@@ -296,8 +296,14 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $request = new WebSocketRequest();
         $request->injectRequest($guzzleRequest);
 
-        // load the application and try to locate the handler
-        $handler = $this->findApplication($request)->getHandlerManager()->locate($request);
+        // load the application
+        $application = $this->findApplication($request);
+
+        // register the applications class loader
+        $application->registerClassLoaders();
+
+        // load the handler
+        $handler = $application->getHandlerManager()->locate($request);
         $handler->injectRequest($request);
 
         // return the initialized handler instance
@@ -328,7 +334,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         // if not, check if the request matches a folder
         if (array_key_exists($applicationName, $this->applications)) {
 
+            // load the application from the array
             $application = $this->applications[$applicationName];
+
         } else { // iterate over the applications and check if one of the virtual hosts match the request
 
             foreach ($this->applications as $application) {
