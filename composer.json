@@ -1,6 +1,5 @@
 {
     "name": "techdivision/websocketprotocol",
-    "type": "package",
     "description": "Provides a web socket connection handler.",
     "homepage": "https://github.com/techdivision/TechDivision_WebSocketProtocol",
     "license": [ "OSL-3.0" ],
