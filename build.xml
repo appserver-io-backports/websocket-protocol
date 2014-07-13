@@ -4,7 +4,7 @@
 	<property environment="env" />
 	
     <property name="namespace" value="techdivision" />
-    <property name="module" value="persistencecontainerprotocol"/>
+    <property name="module" value="websocketprotocol"/>
     <property name="codepool" value="vendor"/>
     <property name="unique.name" value="${codepool}/${namespace}/${module}" />
     <property name="php-src.dir" value="${basedir}/src" />
