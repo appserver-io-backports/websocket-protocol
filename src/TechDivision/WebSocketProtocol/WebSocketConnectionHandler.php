@@ -22,12 +22,12 @@
 
 namespace TechDivision\WebSocketProtocol;
 
+use Ratchet\Http\HttpRequestParser;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\Version;
 use Ratchet\WebSocket\Encoding\ToggleableValidator;
-use Ratchet\WebSocket\HttpRequestParser;
 use Ratchet\WebSocket\VersionManager;
 use Ratchet\WebSocket\Version\RFC6455;
 use Ratchet\WebSocket\Version\HyBi10;
