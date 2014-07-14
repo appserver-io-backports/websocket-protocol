@@ -22,7 +22,7 @@
 namespace TechDivision\WebSocketProtocol;
 
 use Guzzle\Http\Message\RequestInterface;
-use TechDivision\ApplicationServer\Interfaces\ApplicationInterface;
+use TechDivision\Application\Interfaces\ApplicationInterface;
 
 /**
  * Request interface to be implemented by web socket request implementations.

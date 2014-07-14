@@ -22,6 +22,8 @@
 
 namespace TechDivision\WebSocketProtocol;
 
+use TechDivision\Application\Interfaces\ManagerInterface;
+
 /**
  * The handler context inteface for all handler managers.
  *
@@ -33,16 +35,15 @@ namespace TechDivision\WebSocketProtocol;
  * @link      https://github.com/techdivision/TechDivision_WebSocketProtocol
  * @link      http://www.appserver.io
  */
-interface HandlerContext
+interface HandlerContext extends ManagerInterface
 {
 
     /**
-     * Has been automatically invoked by the container after the application
-     * instance has been created.
+     * The unique identifier to be registered in the application context.
      *
-     * @return \TechDivision\WebContainer\WebApplication The connected application
+     * @var string
      */
-    public function initialize();
+    const IDENTIFIER = HandlerContext::class;
 
     /**
      * Returns the registered handlers.
