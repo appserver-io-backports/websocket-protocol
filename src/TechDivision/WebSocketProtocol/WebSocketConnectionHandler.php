@@ -22,19 +22,20 @@
 
 namespace TechDivision\WebSocketProtocol;
 
+use Ratchet\Http\HttpRequestParser;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\Version;
 use Ratchet\WebSocket\Encoding\ToggleableValidator;
-use Ratchet\WebSocket\HttpRequestParser;
 use Ratchet\WebSocket\VersionManager;
 use Ratchet\WebSocket\Version\RFC6455;
 use Ratchet\WebSocket\Version\HyBi10;
 use Ratchet\WebSocket\Version\Hixie76;
 use Guzzle\Http\Message\Response;
 use Guzzle\Http\Message\RequestInterface;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\WebSocketServer\HandlerManager;
+use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
  * The adapter to handle WebSocket requests/responses.
@@ -107,7 +108,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * The server context instance.
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
@@ -143,8 +144,8 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Inits the connection handler by given context and params
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The servers context
-     * @param array                                                     $params        The params for connection handler
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The servers context
+     * @param array                                                  $params        The params for connection handler
      *
      * @return void
      */
@@ -196,7 +197,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Returns the worker instance which starte this worker thread
      *
-     * @return \TechDivision\WebServer\Interfaces\WorkerInterface
+     * @return \TechDivision\Server\Interfaces\WorkerInterface
      */
     protected function getWorker()
     {
@@ -294,8 +295,14 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $request = new WebSocketRequest();
         $request->injectRequest($guzzleRequest);
 
-        // load the application and try to locate the handler
-        $handler = $this->findApplication($request)->locateHandler($request);
+        // load the application
+        $application = $this->findApplication($request);
+
+        // register the applications class loader
+        $application->registerClassLoaders();
+
+        // load the handler
+        $handler = $application->getManager(HandlerContext::IDENTIFIER)->locate($request);
         $handler->injectRequest($request);
 
         // return the initialized handler instance
@@ -326,7 +333,9 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         // if not, check if the request matches a folder
         if (array_key_exists($applicationName, $this->applications)) {
 
+            // load the application from the array
             $application = $this->applications[$applicationName];
+
         } else { // iterate over the applications and check if one of the virtual hosts match the request
 
             foreach ($this->applications as $application) {
@@ -370,7 +379,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
             $decor = $this->connections[$conn];
             $this->connections->detach($conn);
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
+                foreach ($application->getManager(HandlerContext::IDENTIFIER)->getHandlers() as $handler) {
                     $handler->onClose($decor);
                 }
             }
@@ -390,7 +399,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     {
         if ($conn->WebSocket->established) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
+                foreach ($application->getManager(HandlerContext::IDENTIFIER)->getHandlers() as $handler) {
                     $handler->onError($this->connections[$conn], $e);
                 }
             }
@@ -437,7 +446,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     {
         if ($this->isSpGenerated === false) {
             foreach ($this->applications as $application) {
-                foreach ($application->getHandlerManager()->getHandlers() as $handler) {
+                foreach ($application->getManager(HandlerContext::IDENTIFIER)->getHandlers() as $handler) {
                     if ($this->_decorating instanceof WsServerInterface) {
                         $this->acceptedSubProtocols = array_merge($this->acceptedSubProtocols, array_flip($handler->getSubProtocols()));
                     }
