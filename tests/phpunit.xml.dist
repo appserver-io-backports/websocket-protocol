@@ -21,5 +21,6 @@
     </logging>
     <php>
         <ini name="date.timezone" value="Europe/Berlin"/>
+        <ini name="auto_globals_jit" value="On"/>
     </php>
 </phpunit>
