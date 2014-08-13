@@ -1,3 +1,14 @@
+# Version 0.2.2
+
+## Bugfixes
+
+* Replace HandlerContext::class with class name for PHP 5.4 compatibility
+* Resolve some PHPMD errors/warnings
+
+## Features
+
+* None
+
 # Version 0.2.1
 
 ## Bugfixes
