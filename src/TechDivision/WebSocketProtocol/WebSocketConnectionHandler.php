@@ -34,7 +34,6 @@ use Ratchet\WebSocket\Version\HyBi10;
 use Ratchet\WebSocket\Version\Hixie76;
 use Guzzle\Http\Message\Response;
 use Guzzle\Http\Message\RequestInterface;
-use TechDivision\WebSocketServer\HandlerManager;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
@@ -214,7 +213,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
-        $conn->WebSocket = new \StdClass();
+        $conn->WebSocket = new \stdClass();
         $conn->WebSocket->established = false;
     }
 
@@ -328,7 +327,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
         $request->setHandlerPath($request->getPath());
 
         // strip the leading slash and explode the application name
-        list ($applicationName, $path) = explode('/', substr($pathInfo, 1));
+        list ($applicationName, ) = explode('/', substr($pathInfo, 1));
 
         // if not, check if the request matches a folder
         if (array_key_exists($applicationName, $this->applications)) {

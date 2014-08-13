@@ -43,7 +43,7 @@ interface HandlerContext extends ManagerInterface
      *
      * @var string
      */
-    const IDENTIFIER = HandlerContext::class;
+    const IDENTIFIER = 'TechDivision\WebSocketProtocol\HandlerContext';
 
     /**
      * Returns the registered handlers.

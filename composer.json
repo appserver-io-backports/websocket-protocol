@@ -3,21 +3,24 @@
 	"description" : "Provides a web socket connection handler.",
 	"homepage" : "https://github.com/techdivision/TechDivision_WebSocketProtocol",
 	"license" : "OSL-3.0",
-    "keywords" : [
-        "php",
-        "socket",
-        "web",
-        "protocol"
-    ],
-    "authors" : [{
-            "name" : "Tim Wagner",
-            "email" : "tw@techdivision.com",
-            "homepage" : "http://www.techdivision.com",
-            "role" : "Developer"
-        }
-    ],
+	"keywords" : [
+		"php",
+		"socket",
+		"web",
+		"protocol"
+	],
+	"authors" : [{
+			"name" : "Tim Wagner",
+			"email" : "tw@techdivision.com",
+			"homepage" : "http://www.techdivision.com",
+			"role" : "Developer"
+		}
+	],
 	"require" : {
-		"php" : ">=5.4.0"
+		"php" : ">=5.4.0",
+		"techdivision/application" : "0.2.*",
+		"cboden/ratchet" : "0.3.*",
+		"techdivision/server" : "0.1.*"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : "3.7.*",
@@ -36,9 +39,9 @@
 			"github.com" : "604a3b5943228e434a5b52c2ba3cf72286d30db9"
 		}
 	},
-    "support" : {
-        "email" : "t.wagner@techdivision.com",
-        "issues" : "https://github.com/techdivision/TechDivision_WebSocketProtocol/issues",
-        "source" : "https://github.com/techdivision/TechDivision_WebSocketProtocol"
-    }
+	"support" : {
+		"email" : "t.wagner@techdivision.com",
+		"issues" : "https://github.com/techdivision/TechDivision_WebSocketProtocol/issues",
+		"source" : "https://github.com/techdivision/TechDivision_WebSocketProtocol"
+	}
 }
