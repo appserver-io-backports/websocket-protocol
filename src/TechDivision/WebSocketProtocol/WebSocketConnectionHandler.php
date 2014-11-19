@@ -121,7 +121,7 @@ class WebSocketConnectionHandler implements MessageComponentInterface
     /**
      * Initialize the web socket server with the container's applications.
      *
-     * @param array &$applications The initialized applications
+     * @param array $applications The initialized applications
      */
     public function __construct(&$applications)
     {
